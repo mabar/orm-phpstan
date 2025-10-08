@@ -3,3 +3,8 @@ parameters:
     paths:
         - src
         - tests/RawSimpleErrorFormatter.php
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - '#^Doing instanceof PHPStan\\Type\\(.+)Type is error-prone and deprecated(.+)#'
+        - '#^Doing instanceof PHPStan\\Type\\Type(.+) is error-prone and deprecated(.+)#'
+        - '#^Call to deprecated method (hasProperty|getProperty)\(\) of class PHPStan\\Reflection\\ClassReflection(.+)#'
