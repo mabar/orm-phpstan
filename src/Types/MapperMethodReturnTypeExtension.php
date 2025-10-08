@@ -18,8 +18,9 @@ use PHPStan\Type\IterableType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeWithClassName;
-
+use function assert;
+use function count;
+use function in_array;
 
 class MapperMethodReturnTypeExtension implements DynamicMethodReturnTypeExtension
 {
@@ -64,13 +65,18 @@ class MapperMethodReturnTypeExtension implements DynamicMethodReturnTypeExtensio
 	{
 		$mapper = $scope->getType($methodCall->var);
 
-		$defaultReturn = ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+		$defaultReturn = ParametersAcceptorSelector::selectFromArgs(
+			$scope,
+			$methodCall->getArgs(),
+			$methodReflection->getVariants()
+		)->getReturnType();
 
-		if (!$mapper instanceof TypeWithClassName || $mapper->getClassName() === DbalMapper::class) {
+		if (in_array(DbalMapper::class, $mapper->getObjectClassNames(), true)) {
 			return $defaultReturn;
 		}
 
-		$currentMapper = $this->reflectionProvider->getClass($mapper->getClassName());
+		assert(count($mapper->getObjectClassNames()) === 1);
+		$currentMapper = $this->reflectionProvider->getClass($mapper->getObjectClassNames()[0]);
 
 		do {
 			$mapperClass = $currentMapper->getName();

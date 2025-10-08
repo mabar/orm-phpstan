@@ -10,7 +10,6 @@ use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\IntersectionType;
-use PHPStan\Type\IterableType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
@@ -40,13 +39,17 @@ class RelationshipReturnTypeExtension implements DynamicMethodReturnTypeExtensio
 
 		if ($varType instanceof IntersectionType) {
 			foreach ($varType->getTypes() as $type) {
-				if ($type instanceof IterableType) {
+				if ($type->isIterable()->yes()) {
 					$collectionType = new ObjectType(ICollection::class);
 					return TypeCombinator::intersect($type, $collectionType);
 				}
 			}
 		}
 
-		return ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+		return ParametersAcceptorSelector::selectFromArgs(
+			$scope,
+			$methodCall->getArgs(),
+			$methodReflection->getVariants()
+		)->getReturnType();
 	}
 }

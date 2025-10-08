@@ -81,7 +81,7 @@ class RepositoryReturnTypeExtension implements DynamicMethodReturnTypeExtension
 		$repositoryType = new ObjectType(IRepository::class);
 		return TypeTraverser::map(
 			$repository,
-			function ($type, $traverse) use ($repositoryType, $methodReflection, $scope): Type {
+			function ($type, $traverse) use ($repositoryType, $methodReflection, $methodCall, $scope): Type {
 				if ($type instanceof UnionType || $type instanceof IntersectionType) {
 					return $traverse($type);
 				}
@@ -91,7 +91,7 @@ class RepositoryReturnTypeExtension implements DynamicMethodReturnTypeExtension
 
 				/** @var class-string<Repository> $repositoryClassName */
 				$repositoryClassName = $type->getClassName();
-				return $this->getEntityTypeFromMethodClass($repositoryClassName, $methodReflection, $scope);
+				return $this->getEntityTypeFromMethodClass($repositoryClassName, $methodReflection, $methodCall, $scope);
 			}
 		);
 	}
@@ -103,17 +103,26 @@ class RepositoryReturnTypeExtension implements DynamicMethodReturnTypeExtension
 	private function getEntityTypeFromMethodClass(
 		string $repositoryClassName,
 		MethodReflection $methodReflection,
+		MethodCall $methodCall,
 		Scope $scope
 	): Type
 	{
 		if ($repositoryClassName === Repository::class || $repositoryClassName === IRepository::class) {
-			return ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+			return ParametersAcceptorSelector::selectFromArgs(
+				$scope,
+				$methodCall->getArgs(),
+				$methodReflection->getVariants()
+			)->getReturnType();
 		}
 
 		try {
 			$repositoryReflection = $this->reflectionProvider->getClass($repositoryClassName);
 		} catch (ClassNotFoundException $e) {
-			return ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+			return ParametersAcceptorSelector::selectFromArgs(
+				$scope,
+				$methodCall->getArgs(),
+				$methodReflection->getVariants()
+			)->getReturnType();
 		}
 
 		$entityType = $this->repositoryEntityTypeHelper->resolveFirst(

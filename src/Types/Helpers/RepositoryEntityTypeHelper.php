@@ -10,11 +10,10 @@ use PhpParser\NodeVisitor\NameResolver;
 use PHPStan\Analyser\Scope;
 use PHPStan\Parser\Parser;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Type\Constant\ConstantArrayType;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
-
+use function assert;
+use function is_string;
 
 class RepositoryEntityTypeHelper
 {
@@ -33,14 +32,15 @@ class RepositoryEntityTypeHelper
 
 		if ($entityClassNameTypes === null) {
 			return new ObjectType(IEntity::class);
-		} else {
-			\assert($entityClassNameTypes instanceof ConstantArrayType);
-			$classNameTypes = $entityClassNameTypes->getValueTypes();
-			\assert(\count($classNameTypes) > 0);
-			$classNameType = $classNameTypes[0];
-			\assert($classNameType instanceof ConstantStringType);
-			return new ObjectType($classNameType->getValue());
 		}
+
+		\assert($entityClassNameTypes->isConstantArray()->yes());
+		$classNameType = $entityClassNameTypes->getIterableValueType();
+
+		$classNameValue = $classNameType->getConstantScalarValues()[0];
+		assert(is_string($classNameValue));
+
+		return new ObjectType($classNameValue);
 	}
 
 	private function parseEntityClassNameTypes(ClassReflection $repositoryReflection, Scope $scope): ?Type

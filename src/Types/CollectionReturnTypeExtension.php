@@ -72,9 +72,13 @@ class CollectionReturnTypeExtension implements DynamicMethodReturnTypeExtension
 		if (!$varType instanceof IntersectionType) {
 			if (in_array($methodName, $collectionReturnMethods, true)) {
 				return $varType;
-			} else {
-				return ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
 			}
+
+			return ParametersAcceptorSelector::selectFromArgs(
+				$scope,
+				$methodCall->getArgs(),
+				$methodReflection->getVariants()
+			)->getReturnType();
 		}
 
 		if (in_array($methodName, $collectionReturnMethods, true)) {
