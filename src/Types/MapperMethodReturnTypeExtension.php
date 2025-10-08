@@ -49,7 +49,7 @@ class MapperMethodReturnTypeExtension implements DynamicMethodReturnTypeExtensio
 
 	public function isMethodSupported(MethodReflection $methodReflection): bool
 	{
-		static $methods = [
+		$methods = [
 			'toEntity',
 			'toCollection',
 		];
@@ -88,8 +88,6 @@ class MapperMethodReturnTypeExtension implements DynamicMethodReturnTypeExtensio
 				break;
 			}
 			$mapperClass = $currentMapper->getName();
-
-			assert(is_string($mapperClass));
 		} while (!\class_exists($repositoryClass) && $mapperClass !== DbalMapper::class);
 
 		try {

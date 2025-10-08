@@ -53,7 +53,7 @@ class RepositoryReturnTypeExtension implements DynamicMethodReturnTypeExtension
 
 	public function isMethodSupported(MethodReflection $methodReflection): bool
 	{
-		static $methods = [
+		$methods = [
 			'getBy',
 			'getByChecked',
 			'getById',
@@ -130,19 +130,19 @@ class RepositoryReturnTypeExtension implements DynamicMethodReturnTypeExtension
 			$scope
 		);
 
-		static $collectionReturnMethods = [
+		$collectionReturnMethods = [
 			'findAll',
 			'findBy',
 			'findById',
 			'findByIds',
 		];
 
-		static $entityReturnMethods = [
+		$entityReturnMethods = [
 			'getBy',
 			'getById',
 		];
 
-		static $entityNonNullReturnMethods = [
+		$entityNonNullReturnMethods = [
 			'getByChecked',
 			'getByIdChecked',
 			'persist',

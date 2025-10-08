@@ -26,7 +26,7 @@ class CollectionReturnTypeExtension implements DynamicMethodReturnTypeExtension
 
 	public function isMethodSupported(MethodReflection $methodReflection): bool
 	{
-		static $methods = [
+		$methods = [
 			'getBy',
 			'getByChecked',
 			'getById',
@@ -48,20 +48,20 @@ class CollectionReturnTypeExtension implements DynamicMethodReturnTypeExtension
 		Scope $scope
 	): Type
 	{
-		static $collectionReturnMethods = [
+		$collectionReturnMethods = [
 			'findBy',
 			'orderBy',
 			'resetOrderBy',
 			'limitBy',
 		];
 
-		static $entityReturnMethods = [
+		$entityReturnMethods = [
 			'getBy',
 			'getById',
 			'fetch',
 		];
 
-		static $entityNonNullReturnMethods = [
+		$entityNonNullReturnMethods = [
 			'getByChecked',
 			'getByIdChecked',
 		];
